@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">QuickRent</string>
+    <string name="default_web_client_id">9931831061-m69d02vaacq53dr4q72jhmas59113f36.apps.googleusercontent.com</string>
+    <string name="title_activity_bottom_navigation.kt">BottomNavigation.kt</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_create_post_screen">CreatePostScreen</string>
+    <string name="title_activity_profile_screen">ProfileScreen</string>
+    <string name="title_activity_messages_screen">MessagesScreen</string>
+    <string name="title_activity_cart_screen">CartScreen</string>
+    <string name="category_list_description">Категориялар тізімі</string>
+
+</resources>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "9931831061",
+    "project_id": "quickrent-3149c",
+    "storage_bucket": "quickrent-3149c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9931831061:android:1ac5212e769dd2cbaa5b1c",
+        "android_client_info": {
+          "package_name": "com.example.quickrent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "9931831061-m69d02vaacq53dr4q72jhmas59113f36.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC68HyCe4LZausSe0GQjP5rqXkuvvED-qs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "9931831061-m69d02vaacq53dr4q72jhmas59113f36.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

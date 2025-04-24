@@ -1,0 +1,65 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Создать объявление"
+            android:textSize="24sp"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/titleField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Название" />
+
+        <EditText
+            android:id="@+id/descriptionField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Описание" />
+
+        <EditText
+            android:id="@+id/priceField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Цена"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/categoryIdField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID Категории"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/availableFromField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Доступно с (ГГГГ-ММ-ДД)" />
+
+        <EditText
+            android:id="@+id/availableToField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Доступно до (ГГГГ-ММ-ДД)" />
+
+        <Button
+            android:id="@+id/createPostButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Далее"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+</ScrollView>
