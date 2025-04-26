@@ -27,18 +27,12 @@ interface ApiService {
     @POST("/api/users/logout")
     fun logout(@Header("Authorization") token: String): Call<Void>
 
-    @POST("api/listings")
+    @POST("/api/listings")
     suspend fun createListing(
         @Header("Authorization") token: String,
         @Body listing: ListingDTO
-    ): Response<Void>
-    @Multipart
-    @POST("api/listings/with-photo")
-    suspend fun uploadListingWithPhotos(
-        @Header("Authorization") token: String,
-        @Part photos: List<MultipartBody.Part>
-        // Можно также передавать JSON часть в виде @Part("data") RequestBody
-    ): Response<Void>
+    ): Response<ListingDTO>
+
     // Получить главные категории (parentId == null)
     @GET("api/categories/main")
     fun getMainCategories(@Header("Authorization") token: String): Call<List<CategoryDto>>

@@ -1,12 +1,13 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
@@ -20,13 +21,15 @@
             android:id="@+id/titleField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Название" />
+            android:hint="Название"
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/descriptionField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Описание" />
+            android:hint="Описание"
+            android:inputType="textMultiLine" />
 
         <EditText
             android:id="@+id/priceField"
@@ -43,23 +46,48 @@
             android:inputType="number" />
 
         <EditText
+            android:id="@+id/locationIdField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID Локации"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/toolIdField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID Инструмента (необязательно)"
+            android:inputType="number" />
+
+        <EditText
             android:id="@+id/availableFromField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Доступно с (ГГГГ-ММ-ДД)" />
+            android:hint="Доступно с (ГГГГ-ММ-ДД)"
+            android:focusable="false"
+            android:clickable="true" />
 
         <EditText
             android:id="@+id/availableToField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Доступно до (ГГГГ-ММ-ДД)" />
+            android:hint="Доступно до (ГГГГ-ММ-ДД)"
+            android:focusable="false"
+            android:clickable="true" />
+
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/photoGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/createPostButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Далее"
+            android:text="Создать объявление"
             android:layout_marginTop="24dp" />
-
     </LinearLayout>
 </ScrollView>

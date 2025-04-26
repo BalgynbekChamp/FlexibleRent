@@ -2,14 +2,20 @@ package com.example.quickrent.screens
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.*
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.quickrent.R
-import com.example.quickrent.network.RetrofitClient
 import com.example.quickrent.data.model.ListingDTO
+import com.example.quickrent.data.model.PhotoDTO
+import com.example.quickrent.network.RetrofitClient
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -23,6 +29,24 @@ class CreatePostFragment : Fragment() {
     private lateinit var availableFromField: EditText
     private lateinit var availableToField: EditText
     private lateinit var createPostButton: Button
+    private lateinit var photoGrid: GridLayout
+    private lateinit var locationIdField: EditText
+    private lateinit var toolIdField: EditText
+
+
+    private val photoList = mutableListOf<PhotoDTO>()
+    private val imageUris = mutableListOf<Uri>()
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            imageUris.add(it)
+            val photoDTO = createPhotoDTOFromUri(it)
+            if (photoDTO != null) {
+                photoList.add(photoDTO)
+                addImageToGrid(it)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +61,10 @@ class CreatePostFragment : Fragment() {
         availableFromField = view.findViewById(R.id.availableFromField)
         availableToField = view.findViewById(R.id.availableToField)
         createPostButton = view.findViewById(R.id.createPostButton)
+        photoGrid = view.findViewById(R.id.photoGrid)
+        locationIdField = view.findViewById(R.id.locationIdField)
+        toolIdField = view.findViewById(R.id.toolIdField)
+
 
         createPostButton.setOnClickListener {
             createPost()
@@ -54,6 +82,8 @@ class CreatePostFragment : Fragment() {
             }
         }
 
+        addImagePlaceholder()
+
         return view
     }
 
@@ -64,6 +94,9 @@ class CreatePostFragment : Fragment() {
         val categoryId = categoryIdField.text.toString().toLongOrNull()
         val availableFrom = availableFromField.text.toString()
         val availableTo = availableToField.text.toString()
+        val locationId = locationIdField.text.toString().toLongOrNull() ?: 1L
+        val toolId = toolIdField.text.toString().toLongOrNull()
+
 
         if (title.isBlank() || description.isBlank() || price == null || categoryId == null) {
             Toast.makeText(requireContext(), "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
@@ -73,11 +106,10 @@ class CreatePostFragment : Fragment() {
         val listing = ListingDTO(
             id = null,
             title = title,
-            userId = 1L, // тестовое значение
+            userId = 1L,
             description = description,
             status = "ACTIVE",
             locationId = 1L,
-            imageUrl = null,
             price = price,
             viewsCount = 0,
             categoryId = categoryId,
@@ -85,7 +117,8 @@ class CreatePostFragment : Fragment() {
             availableTo = availableTo,
             createdAt = null,
             isPopular = false,
-            toolId = null
+            toolId = null,
+            photos = photoList
         )
 
         val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
@@ -94,16 +127,9 @@ class CreatePostFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.api.createListing(token, listing)
-
                 if (response.isSuccessful) {
                     Toast.makeText(requireContext(), "Объявление создано!", Toast.LENGTH_SHORT).show()
                     clearFields()
-
-                    // Переход на фрагмент загрузки фото
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, UploadPhotoFragment())
-                        .addToBackStack(null)  // Добавляем в back stack
-                        .commit()
                 } else {
                     Toast.makeText(requireContext(), "Ошибка создания: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
@@ -120,6 +146,10 @@ class CreatePostFragment : Fragment() {
         categoryIdField.text.clear()
         availableFromField.text.clear()
         availableToField.text.clear()
+        photoGrid.removeAllViews()
+        imageUris.clear()
+        photoList.clear()
+        addImagePlaceholder()
     }
 
     private fun showDatePickerDialog(onDateSelected: (String) -> Unit) {
@@ -135,5 +165,48 @@ class CreatePostFragment : Fragment() {
             today.dayOfMonth
         )
         datePicker.show()
+    }
+
+    private fun addImagePlaceholder() {
+        val imageView = ImageView(requireContext()).apply {
+            setImageResource(R.drawable.ic_add_photo_create_post)  // Иконка добавления фото
+            layoutParams = ViewGroup.LayoutParams(300, 300)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setPadding(16, 16, 16, 16)
+            setBackgroundResource(R.drawable.border_bg)
+            setOnClickListener {
+                pickImageLauncher.launch("image/*")  // Здесь запускается выбор фото
+            }
+        }
+        photoGrid.addView(imageView)  // Добавляем placeholder в photoGrid
+    }
+
+
+    private fun addImageToGrid(uri: Uri) {
+        val imageView = ImageView(requireContext()).apply {
+            setImageURI(uri)
+            layoutParams = ViewGroup.LayoutParams(300, 300)
+            scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+        photoGrid.addView(imageView, photoGrid.childCount - 1)
+    }
+
+    private fun createPhotoDTOFromUri(uri: Uri): PhotoDTO? {
+        val returnCursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null)
+        returnCursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+            it.moveToFirst()
+            val name = it.getString(nameIndex)
+            val size = it.getLong(sizeIndex)
+            return PhotoDTO(
+                filePath = uri.toString(),
+                fileName = name,
+                size = size,
+                entityType = "LISTING",
+                entityId = null
+            )
+        }
+        return null
     }
 }
