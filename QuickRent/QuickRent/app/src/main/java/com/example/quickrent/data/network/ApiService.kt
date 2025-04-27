@@ -44,4 +44,15 @@ interface ApiService {
         @Path("parentId") parentId: Long
     ): Call<List<CategoryDTO>>
 
+    @GET("api/listings/category/{categoryId}")
+    fun getListingsByCategory(
+        @Header("Authorization") token: String,
+        @Path("categoryId") categoryId: Long
+    ): Call<List<ListingDTO>>
+
+    @GET("/api/categories/subcategories")
+    suspend fun getSubcategories(
+        @Header("Authorization") token: String
+    ): Response<List<CategoryDTO>>
+
 }
