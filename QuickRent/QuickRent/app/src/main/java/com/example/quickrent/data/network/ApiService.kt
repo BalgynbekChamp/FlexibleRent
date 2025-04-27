@@ -37,7 +37,7 @@ interface ApiService {
     @GET("api/categories/main")
     fun getMainCategories(@Header("Authorization") token: String): Call<List<CategoryDTO>>
 
-    // Получить подкатегории по родителю
+    // Получить подкатегории по родител
     @GET("api/categories/subcategories/{parentId}")
     fun getSubcategories(
         @Header("Authorization") token: String,  // Добавляем заголовок для токена
