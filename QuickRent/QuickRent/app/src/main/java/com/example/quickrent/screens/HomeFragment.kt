@@ -28,7 +28,7 @@ class HomeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var categoryAdapter: CategoryAdapter
     private val apiService = RetrofitClient.api // или как у тебя называется клиент
-    private var categories: List<CategoryDto> = emptyList()
+    private var categories: List<CategoryDTO> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
