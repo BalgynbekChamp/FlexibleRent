@@ -1,12 +1,15 @@
 package com.example.quickrent.screens
-
-
+import androidx.recyclerview.widget.GridLayoutManager
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,12 +23,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import android.content.Context
 
-
 class HomeFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var categoryAdapter: CategoryAdapter
     private val apiService = RetrofitClient.api // или как у тебя называется клиент
+    private var categories: List<CategoryDto> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +36,19 @@ class HomeFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         recyclerView = view.findViewById(R.id.categoryRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        // Настроим EditText для поиска
+        val searchEditText: EditText = view.findViewById(R.id.searchEditText)
+        searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                filterCategories(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         return view
     }
 
@@ -63,7 +78,7 @@ class HomeFragment : Fragment() {
                 response: Response<List<CategoryDTO>>
             ) {
                 if (response.isSuccessful) {
-                    val categories = response.body() ?: emptyList()
+                    categories = response.body() ?: emptyList()
                     categoryAdapter = CategoryAdapter(categories) { clickedCategory ->
                         Log.d("HomeFragment", "Clicked category: ${clickedCategory.name}, parentId: ${clickedCategory.parentId}")
                         if (clickedCategory.parentId != null) {
@@ -86,6 +101,21 @@ class HomeFragment : Fragment() {
         })
     }
 
+    private fun filterCategories(query: String) {
+        val filteredCategories = categories.filter {
+            it.name.contains(query, ignoreCase = true)
+        }
+        categoryAdapter = CategoryAdapter(filteredCategories) { clickedCategory ->
+            Log.d("HomeFragment", "Clicked category: ${clickedCategory.name}, parentId: ${clickedCategory.parentId}")
+            if (clickedCategory.parentId != null) {
+                openListingsByCategory(clickedCategory.id)
+            } else {
+                loadCategories(clickedCategory.id)
+            }
+        }
+        recyclerView.adapter = categoryAdapter
+    }
+
     private fun openListingsByCategory(categoryId: Long) {
         Log.d("HomeFragment", "Opening listings for category with ID: $categoryId")
         val fragment = ListingsByCategoryFragment().apply {
@@ -95,10 +125,8 @@ class HomeFragment : Fragment() {
         }
 
         parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment) // Убедись что у тебя есть контейнер с таким id
+            .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
     }
-
-
 }

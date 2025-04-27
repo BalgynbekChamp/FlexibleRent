@@ -3,19 +3,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center">
+    android:gravity="center"
+    android:padding="16dp">
 
+    <!-- Заголовок -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Профиль"
         android:textSize="24sp"
-        />
+        android:layout_marginBottom="16dp"/>
 
+    <!-- 1x2 Grid Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:paddingBottom="16dp">
+
+        <!-- Секция для арендодателя -->
+        <Button
+            android:id="@+id/renterButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Арендодатель"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Секция для арендатора -->
+        <Button
+            android:id="@+id/renteeButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Аренда"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Кнопка для выхода внизу -->
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
-        android:layout_centerInParent="true"/>
+        android:text="Выход"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>
