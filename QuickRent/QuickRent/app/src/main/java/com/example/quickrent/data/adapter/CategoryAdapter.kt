@@ -9,11 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.quickrent.R
-import com.example.quickrent.model.CategoryDto
+import com.example.quickrent.data.model.CategoryDTO
 
 class CategoryAdapter(
-    private val categories: List<CategoryDto>,
-    private val onItemClick: (CategoryDto) -> Unit
+    private val categories: List<CategoryDTO>,
+    private val onItemClick: (CategoryDTO) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

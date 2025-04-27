@@ -2,7 +2,6 @@ package com.example.quickrent.screens
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -15,17 +14,19 @@ import androidx.lifecycle.lifecycleScope
 import com.example.quickrent.R
 import com.example.quickrent.data.model.ListingDTO
 import com.example.quickrent.data.model.PhotoDTO
+import com.example.quickrent.data.model.CategoryDTO
 import com.example.quickrent.network.RetrofitClient
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import java.time.LocalDate
+import android.app.AlertDialog
+import android.content.DialogInterface
 
 class CreatePostFragment : Fragment() {
 
     private lateinit var titleField: EditText
     private lateinit var descriptionField: EditText
     private lateinit var priceField: EditText
-    private lateinit var categoryIdField: EditText
+    private lateinit var categoryField: TextView
     private lateinit var availableFromField: EditText
     private lateinit var availableToField: EditText
     private lateinit var createPostButton: Button
@@ -33,9 +34,11 @@ class CreatePostFragment : Fragment() {
     private lateinit var locationIdField: EditText
     private lateinit var toolIdField: EditText
 
-
     private val photoList = mutableListOf<PhotoDTO>()
     private val imageUris = mutableListOf<Uri>()
+
+    private var categories: List<CategoryDTO> = listOf() // List to store categories
+    private var selectedCategoryId: Long? = null // Store selected category ID
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -57,7 +60,7 @@ class CreatePostFragment : Fragment() {
         titleField = view.findViewById(R.id.titleField)
         descriptionField = view.findViewById(R.id.descriptionField)
         priceField = view.findViewById(R.id.priceField)
-        categoryIdField = view.findViewById(R.id.categoryIdField)
+        categoryField = view.findViewById(R.id.categoryField) // Now it's a TextView
         availableFromField = view.findViewById(R.id.availableFromField)
         availableToField = view.findViewById(R.id.availableToField)
         createPostButton = view.findViewById(R.id.createPostButton)
@@ -65,40 +68,64 @@ class CreatePostFragment : Fragment() {
         locationIdField = view.findViewById(R.id.locationIdField)
         toolIdField = view.findViewById(R.id.toolIdField)
 
+        // Set up the category field
+        categoryField.setOnClickListener { fetchCategories() }
 
-        createPostButton.setOnClickListener {
-            createPost()
-        }
-
-        availableFromField.setOnClickListener {
-            showDatePickerDialog { date ->
-                availableFromField.setText(date)
-            }
-        }
-
-        availableToField.setOnClickListener {
-            showDatePickerDialog { date ->
-                availableToField.setText(date)
-            }
-        }
+        createPostButton.setOnClickListener { createPost() }
+        availableFromField.setOnClickListener { showDatePickerDialog { availableFromField.setText(it) } }
+        availableToField.setOnClickListener { showDatePickerDialog { availableToField.setText(it) } }
 
         addImagePlaceholder()
 
         return view
     }
 
+
+    private fun fetchCategories() {
+        val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
+        val token = "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
+
+        lifecycleScope.launch {
+            try {
+                // Используем правильный запрос на подкатегории
+                val response = RetrofitClient.api.getSubcategories(token)
+                if (response.isSuccessful) {
+                    categories = response.body() ?: listOf()
+                    showCategorySelectionDialog()
+                } else {
+                    Toast.makeText(requireContext(), "Ошибка загрузки подкатегорий", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun showCategorySelectionDialog() {
+        val categoryNames = categories.map { it.name }
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Выберите категорию")
+        builder.setItems(categoryNames.toTypedArray()) { dialogInterface: DialogInterface, which: Int ->
+            selectedCategoryId = categories[which].id
+            categoryField.text = categories[which].name // Display the selected category name
+        }
+        builder.show()
+    }
+
     private fun createPost() {
         val title = titleField.text.toString()
         val description = descriptionField.text.toString()
         val price = priceField.text.toString().toBigDecimalOrNull()
-        val categoryId = categoryIdField.text.toString().toLongOrNull()
         val availableFrom = availableFromField.text.toString()
         val availableTo = availableToField.text.toString()
         val locationId = locationIdField.text.toString().toLongOrNull() ?: 1L
         val toolId = toolIdField.text.toString().toLongOrNull()
 
+        // Use a local variable to avoid the smart cast error
+        val localCategoryId = selectedCategoryId
 
-        if (title.isBlank() || description.isBlank() || price == null || categoryId == null) {
+        if (title.isBlank() || description.isBlank() || price == null || localCategoryId == null) {
             Toast.makeText(requireContext(), "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show()
             return
         }
@@ -109,15 +136,15 @@ class CreatePostFragment : Fragment() {
             userId = 1L,
             description = description,
             status = "ACTIVE",
-            locationId = 1L,
+            locationId = locationId,
             price = price,
             viewsCount = 0,
-            categoryId = categoryId,
+            categoryId = localCategoryId,  // Use local variable here
             availableFrom = availableFrom,
             availableTo = availableTo,
             createdAt = null,
             isPopular = false,
-            toolId = null,
+            toolId = toolId,
             photos = photoList
         )
 
@@ -139,13 +166,15 @@ class CreatePostFragment : Fragment() {
         }
     }
 
+
     private fun clearFields() {
         titleField.text.clear()
         descriptionField.text.clear()
         priceField.text.clear()
-        categoryIdField.text.clear()
         availableFromField.text.clear()
         availableToField.text.clear()
+        locationIdField.text.clear()
+        toolIdField.text.clear()
         photoGrid.removeAllViews()
         imageUris.clear()
         photoList.clear()
@@ -169,18 +198,17 @@ class CreatePostFragment : Fragment() {
 
     private fun addImagePlaceholder() {
         val imageView = ImageView(requireContext()).apply {
-            setImageResource(R.drawable.ic_add_photo_create_post)  // Иконка добавления фото
+            setImageResource(R.drawable.ic_add_photo_create_post)
             layoutParams = ViewGroup.LayoutParams(300, 300)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
             setPadding(16, 16, 16, 16)
             setBackgroundResource(R.drawable.border_bg)
             setOnClickListener {
-                pickImageLauncher.launch("image/*")  // Здесь запускается выбор фото
+                pickImageLauncher.launch("image/*")
             }
         }
-        photoGrid.addView(imageView)  // Добавляем placeholder в photoGrid
+        photoGrid.addView(imageView)
     }
-
 
     private fun addImageToGrid(uri: Uri) {
         val imageView = ImageView(requireContext()).apply {
@@ -192,7 +220,7 @@ class CreatePostFragment : Fragment() {
     }
 
     private fun createPhotoDTOFromUri(uri: Uri): PhotoDTO? {
-        val returnCursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null)
+        val returnCursor = requireContext().contentResolver.query(uri, null, null, null, null)
         returnCursor?.use {
             val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)

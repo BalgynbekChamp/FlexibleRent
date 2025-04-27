@@ -15,17 +15,18 @@
             android:text="Создать объявление"
             android:textSize="24sp"
             android:layout_gravity="center_horizontal"
-            android:paddingBottom="16dp"/>
+            android:paddingBottom="16dp" />
 
         <EditText
             android:id="@+id/titleField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Название"
-            android:inputType="text" />
+            android:hint="Название" />
 
         <EditText
             android:id="@+id/descriptionField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Описание"
@@ -33,20 +34,26 @@
 
         <EditText
             android:id="@+id/priceField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Цена"
             android:inputType="numberDecimal" />
 
-        <EditText
-            android:id="@+id/categoryIdField"
+        <TextView
+            android:id="@+id/categoryField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="ID Категории"
-            android:inputType="number" />
+            android:text="Категория"
+            android:padding="12dp"
+            android:background="@drawable/border_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/locationIdField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="ID Локации"
@@ -54,6 +61,7 @@
 
         <EditText
             android:id="@+id/toolIdField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="ID Инструмента (необязательно)"
@@ -61,6 +69,7 @@
 
         <EditText
             android:id="@+id/availableFromField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Доступно с (ГГГГ-ММ-ДД)"
@@ -69,6 +78,7 @@
 
         <EditText
             android:id="@+id/availableToField"
+            style="@style/RoundedEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Доступно до (ГГГГ-ММ-ДД)"
@@ -79,12 +89,13 @@
             android:id="@+id/photoGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            app:columnCount="3"
+            app:orientation="horizontal" />
 
         <Button
             android:id="@+id/createPostButton"
+            style="@style/RoundedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Создать объявление"

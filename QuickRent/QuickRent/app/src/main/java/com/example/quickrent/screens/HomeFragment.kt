@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quickrent.R
 import com.example.quickrent.adapter.CategoryAdapter
-import com.example.quickrent.model.CategoryDto
+import com.example.quickrent.data.model.CategoryDTO
 import com.example.quickrent.network.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
@@ -57,10 +57,10 @@ class HomeFragment : Fragment() {
         else
             RetrofitClient.api.getSubcategories(token, parentId)
 
-        call.enqueue(object : Callback<List<CategoryDto>> {
+        call.enqueue(object : Callback<List<CategoryDTO>> {
             override fun onResponse(
-                call: Call<List<CategoryDto>>,
-                response: Response<List<CategoryDto>>
+                call: Call<List<CategoryDTO>>,
+                response: Response<List<CategoryDTO>>
             ) {
                 if (response.isSuccessful) {
                     val categories = response.body() ?: emptyList()
@@ -79,7 +79,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<List<CategoryDto>>, t: Throwable) {
+            override fun onFailure(call: Call<List<CategoryDTO>>, t: Throwable) {
                 Log.e("Category", "Ошибка загрузки категорий: ${t.message}")
                 Toast.makeText(requireContext(), "Ошибка загрузки", Toast.LENGTH_SHORT).show()
             }
