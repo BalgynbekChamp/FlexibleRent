@@ -1,6 +1,8 @@
 package com.example.quickrent.screens
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +11,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.quickrent.R
 import com.example.quickrent.data.model.ListingDTO
+import com.example.quickrent.network.RetrofitClient
+import kotlinx.coroutines.launch
 
 
 class ListingDetailsFragment : Fragment() {
@@ -66,12 +71,104 @@ class ListingDetailsFragment : Fragment() {
     }
 
     private fun onMessageButtonClicked() {
-        // Открываем чат с арендодателем
-        val chatFragment = ChatFragment.newInstance()
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, chatFragment)
-            .addToBackStack(null)
-            .commit()
+        // Получаем ID текущего пользователя и ID арендодателя
+        val currentUserId = getCurrentUserId() // Метод для получения текущего пользователя
+        val landlordUserId = listing.userId // ID арендодателя из объекта listing
+
+        Log.d("Auth", "Текущий пользователь ID: $currentUserId, Арендодатель ID: $landlordUserId")
+
+        // Проверяем, существует ли чат между текущим пользователем и арендодателем
+        checkExistingChat(currentUserId, landlordUserId)
+    }
+
+    private fun checkExistingChat(currentUserId: Long, landlordUserId: Long) {
+        val token = getAuthToken()
+        if (token.isEmpty()) {
+            Toast.makeText(requireContext(), "Токен не найден", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            runCatching {
+                RetrofitClient.api.getChatsByParticipants(token, currentUserId, landlordUserId) // Метод для получения чатов по участникам
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    val chats = response.body()
+                    if (chats.isNullOrEmpty()) {
+                        // Чат не найден, создаём новый
+                        createChat(currentUserId, landlordUserId)
+                    } else {
+                        // Чат существует, переходим к существующему чату
+                        val existingChat = chats.firstOrNull()
+                        existingChat?.let {
+                            val chatFragment = ChatFragment.newInstance(it.id)
+                            requireActivity().supportFragmentManager.beginTransaction()
+                                .replace(R.id.fragment_container, chatFragment)
+                                .addToBackStack(null)
+                                .commit()
+                        }
+                    }
+                } else {
+                    Log.e("API_ERROR", "Ошибка проверки чатов: ${response.code()} ${response.message()}")
+                    Toast.makeText(requireContext(), "Ошибка проверки чатов", Toast.LENGTH_SHORT).show()
+                }
+            }.onFailure { exception ->
+                Log.e("API_ERROR", "Ошибка запроса: ${exception.localizedMessage}")
+                Toast.makeText(requireContext(), "Ошибка: ${exception.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun createChat(currentUserId: Long, landlordUserId: Long) {
+        if (currentUserId == -1L) {
+            Toast.makeText(requireContext(), "Пользователь не аутентифицирован", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val token = getAuthToken()
+        if (token.isEmpty()) {
+            Toast.makeText(requireContext(), "Токен не найден", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Log.d("Auth", "Токен при создании чата: $token")
+        Log.d("Chat", "currentUserId: $currentUserId, landlordUserId: $landlordUserId")
+
+        lifecycleScope.launch {
+            runCatching {
+                RetrofitClient.api.createChat(token, currentUserId, landlordUserId)
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    val chatId = response.body()?.id
+                    if (chatId != null) {
+                        Toast.makeText(requireContext(), "Чат успешно создан", Toast.LENGTH_SHORT).show()
+
+                        val chatFragment = ChatFragment.newInstance(chatId)
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, chatFragment)
+                            .addToBackStack(null)
+                            .commit()
+                    } else {
+                        Toast.makeText(requireContext(), "Не удалось получить ID чата", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Ошибка создания чата: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            }.onFailure { exception ->
+                Toast.makeText(requireContext(), "Ошибка: ${exception.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun getAuthToken(): String {
+        val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
+        return "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
+    }
+
+    private fun getCurrentUserId(): Long {
+        val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getLong("user_id", -1)
     }
 
     companion object {

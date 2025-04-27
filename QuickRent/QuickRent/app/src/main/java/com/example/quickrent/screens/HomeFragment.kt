@@ -75,13 +75,13 @@ class HomeFragment : Fragment() {
                     recyclerView.adapter = categoryAdapter
                 } else {
                     Log.e("Category", "Ошибка загрузки категорий: ${response.message()}")
-                    Toast.makeText(requireContext(), "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Ошибка загрузки111", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<CategoryDTO>>, t: Throwable) {
                 Log.e("Category", "Ошибка загрузки категорий: ${t.message}")
-                Toast.makeText(requireContext(), "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Ошибка загрузки222", Toast.LENGTH_SHORT).show()
             }
         })
     }

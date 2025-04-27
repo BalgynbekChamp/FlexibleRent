@@ -58,14 +58,23 @@ class LoginActivity : AppCompatActivity() {
                 Log.d("LoginActivity", "Ответ сервера: ${response.code()} - ${response.body()}")
 
                 if (response.isSuccessful && response.body() != null) {
+                    val responseBody = response.body()!!
                     val token = response.body()!!.token
+                    val userId = responseBody.user.id  // Получаем userId из ответа сервера
+
                     Toast.makeText(this@LoginActivity, "Вход выполнен!", Toast.LENGTH_SHORT).show()
 
                     Log.d("LoginActivity", "Полученный токен: $token")
+                    Log.d("LoginActivity", "Полученный userId: $userId")
 
-                    // ✅ Сохранение токена в SharedPreferences
+                    // ✅ Сохранение токена и userId в SharedPreferences
                     val sharedPreferences = getSharedPreferences("QuickRentPrefs", MODE_PRIVATE)
-                    sharedPreferences.edit().putString("auth_token", token).apply()
+                    sharedPreferences.edit().apply {
+                        putString("auth_token", token)
+                        putLong("user_id", userId)  // Сохраняем user_id
+                        apply()
+                    }
+                    Log.d("Auth", "Token and userId saved: $token, $userId")
 
                     // ✅ Переход в MainActivity
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
@@ -80,6 +89,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
 }
