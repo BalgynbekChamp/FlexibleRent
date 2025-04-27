@@ -5,7 +5,7 @@ import com.example.quickrent.network.model.LoginResponse
 import com.example.quickrent.data.model.RegisterRequest
 import com.example.quickrent.data.model.RegisterResponse
 import com.example.quickrent.data.model.ListingDTO
-import com.example.quickrent.model.CategoryDto
+import com.example.quickrent.data.model.CategoryDTO
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Response
@@ -35,13 +35,13 @@ interface ApiService {
 
     // Получить главные категории (parentId == null)
     @GET("api/categories/main")
-    fun getMainCategories(@Header("Authorization") token: String): Call<List<CategoryDto>>
+    fun getMainCategories(@Header("Authorization") token: String): Call<List<CategoryDTO>>
 
     // Получить подкатегории по родителю
     @GET("api/categories/subcategories/{parentId}")
     fun getSubcategories(
         @Header("Authorization") token: String,  // Добавляем заголовок для токена
         @Path("parentId") parentId: Long
-    ): Call<List<CategoryDto>>
+    ): Call<List<CategoryDTO>>
 
 }

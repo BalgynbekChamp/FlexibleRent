@@ -85,20 +85,7 @@ class CreatePostFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
         val token = "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
 
-        lifecycleScope.launch {
-            try {
-                // Используем правильный запрос на подкатегории
-                val response = RetrofitClient.api.getSubcategories(token)
-                if (response.isSuccessful) {
-                    categories = response.body() ?: listOf()
-                    showCategorySelectionDialog()
-                } else {
-                    Toast.makeText(requireContext(), "Ошибка загрузки подкатегорий", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
+
     }
 
 
