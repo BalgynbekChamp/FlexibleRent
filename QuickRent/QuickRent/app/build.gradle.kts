@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")  // Для Glide
+    id ("kotlin-parcelize")
 }
 
 android {

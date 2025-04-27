@@ -1,7 +1,10 @@
 package com.example.quickrent.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
+@Parcelize
 data class ListingDTO(
     val id: Long? = null,
     val title: String,
@@ -18,4 +21,4 @@ data class ListingDTO(
     val isPopular: Boolean = false,
     val toolId: Long? = null,
     val photos: List<PhotoDTO> = emptyList() // <--- добавили сюда!
-)
+):Parcelable

@@ -8,5 +8,8 @@
     <string name="title_activity_messages_screen">MessagesScreen</string>
     <string name="title_activity_cart_screen">CartScreen</string>
     <string name="category_list_description">Категориялар тізімі</string>
-
+    <string name="listing_image">Image</string>
+    <string name="listing_title">Title</string>
+    <string name="listing_description">Description</string>
+    <string name="listing_price">Price</string>
 </resources>

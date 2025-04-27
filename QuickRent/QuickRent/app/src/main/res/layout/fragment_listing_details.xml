@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Изображение объявления -->
+    <ImageView
+        android:id="@+id/listingImageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/listing_image" />
+
+    <!-- Заголовок объявления -->
+    <TextView
+        android:id="@+id/listingTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingTop="16dp"
+        android:text="@string/listing_title" />
+
+    <!-- Описание объявления -->
+    <TextView
+        android:id="@+id/listingDescriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingTop="8dp"
+        android:text="@string/listing_description" />
+
+    <!-- Цена объявления -->
+    <TextView
+        android:id="@+id/listingPriceTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@android:color/holo_green_dark"
+        android:paddingTop="8dp"
+        android:text="@string/listing_price" />
+
+    <Button
+        android:id="@+id/rentButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Арендовать" />
+
+    <Button
+        android:id="@+id/messageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Написать" />
+
+</LinearLayout>

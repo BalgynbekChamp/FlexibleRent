@@ -46,7 +46,6 @@ class HomeFragment : Fragment() {
         val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
         val token = "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
 
-        // Проверяем, что токен не пустой
         if (token == "Bearer ") {
             Log.e("Authorization", "Missing token")
             Toast.makeText(requireContext(), "Пожалуйста, войдите в систему", Toast.LENGTH_SHORT).show()
@@ -54,9 +53,9 @@ class HomeFragment : Fragment() {
         }
 
         val call = if (parentId == null)
-            RetrofitClient.api.getMainCategories(token)  // передаем токен для главных категорий
+            RetrofitClient.api.getMainCategories(token)
         else
-            RetrofitClient.api.getSubcategories(token, parentId)  // передаем токен для подкатегорий
+            RetrofitClient.api.getSubcategories(token, parentId)
 
         call.enqueue(object : Callback<List<CategoryDto>> {
             override fun onResponse(
@@ -65,9 +64,13 @@ class HomeFragment : Fragment() {
             ) {
                 if (response.isSuccessful) {
                     val categories = response.body() ?: emptyList()
-                    // передаем в адаптер и отображаем
                     categoryAdapter = CategoryAdapter(categories) { clickedCategory ->
-                        loadCategories(clickedCategory.id) // загружаем подкатегории при клике
+                        Log.d("HomeFragment", "Clicked category: ${clickedCategory.name}, parentId: ${clickedCategory.parentId}")
+                        if (clickedCategory.parentId != null) {
+                            openListingsByCategory(clickedCategory.id)
+                        } else {
+                            loadCategories(clickedCategory.id)
+                        }
                     }
                     recyclerView.adapter = categoryAdapter
                 } else {
@@ -82,5 +85,20 @@ class HomeFragment : Fragment() {
             }
         })
     }
+
+    private fun openListingsByCategory(categoryId: Long) {
+        Log.d("HomeFragment", "Opening listings for category with ID: $categoryId")
+        val fragment = ListingsByCategoryFragment().apply {
+            arguments = Bundle().apply {
+                putLong("categoryId", categoryId)
+            }
+        }
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment) // Убедись что у тебя есть контейнер с таким id
+            .addToBackStack(null)
+            .commit()
+    }
+
 
 }

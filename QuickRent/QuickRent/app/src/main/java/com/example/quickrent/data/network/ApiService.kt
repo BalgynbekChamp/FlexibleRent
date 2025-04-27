@@ -27,12 +27,6 @@ interface ApiService {
     @POST("/api/users/logout")
     fun logout(@Header("Authorization") token: String): Call<Void>
 
-    @POST("/api/listings")
-    suspend fun createListing(
-        @Header("Authorization") token: String,
-        @Body listing: ListingDTO
-    ): Response<ListingDTO>
-
     // Получить главные категории (parentId == null)
     @GET("api/categories/main")
     fun getMainCategories(@Header("Authorization") token: String): Call<List<CategoryDto>>
@@ -43,5 +37,17 @@ interface ApiService {
         @Header("Authorization") token: String,  // Добавляем заголовок для токена
         @Path("parentId") parentId: Long
     ): Call<List<CategoryDto>>
+
+    @POST("listings")
+    suspend fun createListing(
+        @Header("Authorization") token: String,
+        @Body listing: ListingDTO
+    ): Response<ListingDTO>
+
+    @GET("api/listings/category/{categoryId}")
+    fun getListingsByCategory(
+        @Header("Authorization") token: String,
+        @Path("categoryId") categoryId: Long
+    ): Call<List<ListingDTO>>
 
 }

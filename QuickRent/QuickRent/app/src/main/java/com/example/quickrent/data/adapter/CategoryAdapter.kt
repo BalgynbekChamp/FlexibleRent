@@ -1,5 +1,6 @@
 package com.example.quickrent.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,7 @@ class CategoryAdapter(
             .into(holder.iconImageView)
 
         holder.itemView.setOnClickListener {
+            Log.d("CategoryAdapter", "Clicked category: ${category.name}, ID: ${category.id}")
             onItemClick(category)
         }
     }
