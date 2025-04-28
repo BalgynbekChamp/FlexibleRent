@@ -87,7 +87,7 @@ class CreatePostFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                // Используем правильный запрос на подкатегории
+                // Используем правильный запрос на подкатегориseи
                 val response = RetrofitClient.api.getSubcategories(token)
                 if (response.isSuccessful) {
                     categories = response.body() ?: listOf()
