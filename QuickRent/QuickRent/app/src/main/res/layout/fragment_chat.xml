@@ -2,41 +2,54 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <!-- Список сообщений -->
+    android:orientation="vertical">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/chatToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="#2C3E50"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:title="Чат"
         android:titleTextColor="@android:color/white"
-        android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:titleTextAppearance="@style/ToolbarTitleStyle"
+        android:fitsSystemWindows="true"/>
 
-    <!-- Поле для ввода сообщения -->
-    <ListView
-        android:id="@+id/messagesListView"
+    <!-- Список сообщений -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
 
-    <EditText
-        android:id="@+id/messageEditText"
+    <!-- Поле ввода сообщения + кнопка отправки -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Напишите сообщение"
-        android:inputType="text"
-        android:minHeight="50dp" />
+        android:orientation="horizontal"
+        android:padding="8dp">
 
-    <!-- Кнопка отправки сообщения -->
-    <Button
-        android:id="@+id/sendButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Отправить" />
+        <EditText
+            android:id="@+id/messageEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Напишите сообщение"
+            android:minHeight="48dp"
+            android:background="@drawable/edit_text_background"/>
+
+        <ImageButton
+            android:id="@+id/sendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_send"
+            android:contentDescription="Отправить"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
 </LinearLayout>

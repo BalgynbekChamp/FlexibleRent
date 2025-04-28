@@ -33,6 +33,8 @@ class RegisterActivity : AppCompatActivity() {
             finish()
         }
 
+
+
         // Обработчик клика по кнопке регистрации
         registerButton.setOnClickListener {
             val name = nameField.text.toString().trim()

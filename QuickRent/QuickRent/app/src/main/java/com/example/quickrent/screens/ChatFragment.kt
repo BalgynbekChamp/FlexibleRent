@@ -6,25 +6,28 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ListView
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.quickrent.R
+import com.example.quickrent.data.adapter.ChatAdapter
 import com.example.quickrent.network.RetrofitClient
 import kotlinx.coroutines.launch
-import com.example.quickrent.data.model.ChatDTO
 
 class ChatFragment : Fragment() {
 
-    private lateinit var sendButton: Button
+    private lateinit var sendButton: ImageButton
     private lateinit var messageEditText: EditText
-    private lateinit var messagesListView: ListView
-    private val messages = mutableListOf<String>()  // Здесь будут храниться сообщения
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var chatAdapter: ChatAdapter
+    private var currentUserId: Long = -1L
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,17 +35,22 @@ class ChatFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
 
-        sendButton = view.findViewById(R.id.sendButton)
+
+        sendButton = view.findViewById(R.id.sendButton) as ImageButton
         messageEditText = view.findViewById(R.id.messageEditText)
-        messagesListView = view.findViewById(R.id.messagesListView)
+        recyclerView = view.findViewById(R.id.RecyclerView)
+
+        val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
+        currentUserId = sharedPreferences.getLong("user_id", -1)
+
+        chatAdapter = ChatAdapter(currentUserId)
+        recyclerView.adapter = chatAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        (recyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
 
         sendButton.setOnClickListener {
             sendMessage()
         }
-
-        // Пример простого списка сообщений
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, messages)
-        messagesListView.adapter = adapter
 
         return view
     }
@@ -56,6 +64,10 @@ class ChatFragment : Fragment() {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
+        toolbar.setTitleTextColor(resources.getColor(android.R.color.white))  // Черный цвет
+        toolbar.setTitleTextAppearance(requireContext(), R.style.ToolbarTitleStyle)  // Применяем стиль
+
+
         val chatId = arguments?.getLong("chatId") ?: -1L
         if (chatId != -1L) {
             loadChatAndUser(chatId)
@@ -64,22 +76,19 @@ class ChatFragment : Fragment() {
         }
     }
 
-
     private fun sendMessage() {
         val message = messageEditText.text.toString()
         if (message.isNotEmpty()) {
-            messages.add(message)
+            chatAdapter.addMessage(message, currentUserId)
             messageEditText.text.clear()
 
-            // Обновляем список сообщений
-            (messagesListView.adapter as ArrayAdapter<String>).notifyDataSetChanged()
+            recyclerView.scrollToPosition(chatAdapter.itemCount - 1) // Автопрокрутка вниз
         }
     }
 
     private fun loadChatAndUser(chatId: Long) {
         val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
         val token = "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
-        val currentUserId = sharedPreferences.getLong("user_id", -1)
 
         lifecycleScope.launch {
             try {
@@ -87,10 +96,8 @@ class ChatFragment : Fragment() {
                 if (chatResponse.isSuccessful) {
                     val chat = chatResponse.body()
                     chat?.let {
-                        // Используем participantOneId и participantTwoId для определения другого пользователя
                         val otherUserId = if (it.participantOneId == currentUserId) it.participantTwoId else it.participantOneId
 
-                        // Получаем информацию о другом пользователе
                         val userResponse = RetrofitClient.api.getUserById(token, otherUserId)
                         if (userResponse.isSuccessful) {
                             val user = userResponse.body()
@@ -110,16 +117,11 @@ class ChatFragment : Fragment() {
         }
     }
 
-
-
-
-
     companion object {
-        // Теперь метод принимает chatId
         fun newInstance(chatId: Long): ChatFragment {
             val fragment = ChatFragment()
             val args = Bundle()
-            args.putLong("chatId", chatId) // Передаем chatId в аргументы
+            args.putLong("chatId", chatId)
             fragment.arguments = args
             return fragment
         }

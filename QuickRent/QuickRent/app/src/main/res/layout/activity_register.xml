@@ -9,62 +9,142 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingTop="20dp">
 
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:src="@drawable/logo"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="1dp"
+            android:contentDescription="Logo"
+            android:scaleType="centerInside"/>
+
+        <!-- Поле Имя -->
         <EditText
             android:id="@+id/nameField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Имя"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:drawableLeft="@drawable/ic_user"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Поле Фамилия -->
         <EditText
             android:id="@+id/surnameField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Фамилия"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:drawableLeft="@drawable/ic_user"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Поле Номер телефона -->
         <EditText
             android:id="@+id/phoneField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Номер телефона"
-            android:inputType="phone" />
+            android:inputType="phone"
+            android:drawableLeft="@drawable/ic_phone"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Поле Email -->
         <EditText
             android:id="@+id/emailField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:drawableLeft="@drawable/ic_email"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Поле Пароль -->
         <EditText
             android:id="@+id/passwordField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Пароль"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:drawableLeft="@drawable/ic_lock"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Поле Подтверждение пароля -->
         <EditText
             android:id="@+id/confirmPasswordField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Подтвердите пароль"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:drawableLeft="@drawable/ic_lock"
+            android:drawablePadding="16dp"
+            android:paddingLeft="20dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/rounded_edittext"
+            android:textColor="#333"
+            android:paddingEnd="20dp"
+            android:minHeight="48dp"
+            android:textSize="16sp"/>
 
+        <!-- Кнопка регистрации -->
         <Button
             android:id="@+id/registerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Зарегистрироваться" />
+            android:text="Зарегистрироваться"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#2DD8CF"
+            android:textColor="#fff"
+            android:padding="14dp"
+            android:textSize="16sp"
+            android:minHeight="48dp"
+            android:layout_marginTop="10dp"/>
 
+        <!-- Ссылка на экран авторизации -->
         <TextView
             android:id="@+id/loginLink"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Уже есть аккаунт? Войти"
-            android:textColor="@android:color/holo_blue_dark"
-            android:paddingTop="10dp" />
+            android:textColor="#4CAF50"
+            android:paddingTop="10dp"
+            android:textSize="14sp"/>
     </LinearLayout>
 </ScrollView>

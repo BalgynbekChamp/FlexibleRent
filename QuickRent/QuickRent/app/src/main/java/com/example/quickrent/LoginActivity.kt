@@ -2,15 +2,19 @@ package com.example.quickrent
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.quickrent.network.RetrofitClient
 import com.example.quickrent.network.model.LoginRequest
 import kotlinx.coroutines.launch
+import androidx.core.content.res.ResourcesCompat
 
 class LoginActivity : AppCompatActivity() {
+    private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +25,51 @@ class LoginActivity : AppCompatActivity() {
         val loginButton = findViewById<Button>(R.id.loginButton)
         val registerLink = findViewById<TextView>(R.id.registerLink)
         val forgotPasswordLink = findViewById<TextView>(R.id.forgotPasswordLink)
+
+        // 📌 Установка слушателя на поле пароля для переключения видимости
+
+
+        passwordField.setOnTouchListener { _, event ->
+            val drawable = passwordField.compoundDrawables[2] // Получаем иконку, которая находится справа
+            if (drawable != null && event.action == MotionEvent.ACTION_UP) {
+                val drawableWidth = drawable.bounds.width()
+                val x = event.x
+                if (x >= passwordField.width - drawableWidth) {
+                    // Переключаем видимость пароля
+                    isPasswordVisible = !isPasswordVisible
+                    passwordField.inputType = if (isPasswordVisible) {
+                        // Показываем пароль
+                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    } else {
+                        // Скроем пароль
+                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    }
+
+                    // Меняем иконку глаза
+                    val newDrawable = if (isPasswordVisible) {
+                        R.drawable.ic_eye_on // Открытый глаз
+                    } else {
+                        R.drawable.ic_eye_off // Закрытый глаз
+                    }
+
+                    passwordField.setCompoundDrawablesWithIntrinsicBounds(
+                        passwordField.compoundDrawables[0],
+                        passwordField.compoundDrawables[1],
+                        ResourcesCompat.getDrawable(resources, newDrawable, null),
+                        passwordField.compoundDrawables[3]
+                    )
+
+                    passwordField.setSelection(passwordField.text.length) // Курсор в конец текста
+
+                    // Важно для правильной обработки клика
+                    passwordField.performClick()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+
+
 
         // 📌 Переход на экран регистрации
         registerLink.setOnClickListener {
@@ -89,7 +138,5 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
 }
+
