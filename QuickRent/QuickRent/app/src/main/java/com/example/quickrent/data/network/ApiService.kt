@@ -9,6 +9,7 @@ import com.example.quickrent.data.model.ListingDTO
 import com.example.quickrent.data.model.UserDTO
 
 import com.example.quickrent.data.model.CategoryDTO
+import com.example.quickrent.data.model.PhotoDTO
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -75,6 +76,26 @@ interface ApiService {
     suspend fun getSubcategories(
         @Header("Authorization") token: String
     ): Response<List<CategoryDTO>>
+
     @GET("/api/users/{id}")
     suspend fun getUserById(@Header("Authorization") token: String, @Path("id") userId: Long): Response<UserDTO>
+
+    @GET("/api/chats/user/{userId}")
+    suspend fun getChatsForUser(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: Long
+    ): Response<List<ChatDTO>>
+
+    @GET("photos")
+    suspend fun getPhotoByEntity(
+        @Header("Authorization") token: String,
+        @Query("entityType") entityType: String,
+        @Query("entityId") entityId: Long
+    ): Response<List<PhotoDTO>>
+
+    @GET("/api/listings/popular")
+    fun getPopularListings(
+        @Header("Authorization") token: String
+    ): Call<List<ListingDTO>>
+
 }

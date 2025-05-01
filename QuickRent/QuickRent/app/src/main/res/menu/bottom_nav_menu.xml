@@ -17,8 +17,8 @@
 
     <item
         android:id="@+id/nav_cart"
-        android:icon="@drawable/ic_cart"
-        android:title="Корзина"
+        android:icon="@drawable/ic_notification"
+        android:title="Сообщение"
         android:enabled="true"
         android:checkable="true" />
 

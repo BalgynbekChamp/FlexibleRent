@@ -22,6 +22,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import android.content.Context
+import com.example.quickrent.adapter.ListingAdapter
+import com.example.quickrent.data.model.ListingDTO
+
 
 class HomeFragment : Fragment() {
 
@@ -29,6 +32,8 @@ class HomeFragment : Fragment() {
     private lateinit var categoryAdapter: CategoryAdapter
     private val apiService = RetrofitClient.api // или как у тебя называется клиент
     private var categories: List<CategoryDTO> = emptyList()
+    private lateinit var popularRecyclerView: RecyclerView
+    private lateinit var popularAdapter: ListingAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,12 +54,16 @@ class HomeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
+        popularRecyclerView = view.findViewById(R.id.popularRecyclerView)
+        popularRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadCategories(null) // Загрузим главные категории
+        loadPopularListings()
     }
 
     private fun loadCategories(parentId: Long?) {
@@ -99,6 +108,56 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Ошибка загрузки222", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun loadPopularListings() {
+        val sharedPreferences = requireContext().getSharedPreferences("QuickRentPrefs", Context.MODE_PRIVATE)
+        val token = "Bearer " + (sharedPreferences.getString("auth_token", "") ?: "")
+
+        // Логируем токен перед отправкой запроса
+        Log.d("Popular", "Sending request with token: $token")
+
+        RetrofitClient.api.getPopularListings(token).enqueue(object : Callback<List<ListingDTO>> {
+            override fun onResponse(call: Call<List<ListingDTO>>, response: Response<List<ListingDTO>>) {
+                if (response.isSuccessful) {
+                    val listings = response.body() ?: emptyList()
+
+                    // Логируем успешный ответ с данными
+                    Log.d("Popular", "Successfully loaded popular listings: ${listings.size} items")
+
+                    popularAdapter = ListingAdapter(listings) { selected ->
+                        openListingDetails(selected.id!!)
+                    }
+                    popularRecyclerView.adapter = popularAdapter
+                } else {
+                    Log.e("Popular", "Ошибка загрузки: ${response.code()} ${response.message()}")
+                    Toast.makeText(requireContext(), "Не удалось загрузить популярные", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<ListingDTO>>, t: Throwable) {
+                Log.e("Popular", "Ошибка: ${t.message}")
+                Toast.makeText(requireContext(), "Ошибка подключения", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun openListingDetails(listingId: Long) {
+        if (listingId == -1L) {
+            Toast.makeText(requireContext(), "Некорректный ID объявления", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val fragment = ListingDetailsFragment().apply {
+            arguments = Bundle().apply {
+                putLong("listingId", listingId)
+            }
+        }
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun filterCategories(query: String) {

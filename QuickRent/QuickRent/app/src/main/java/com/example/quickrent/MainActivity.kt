@@ -1,7 +1,6 @@
 package com.example.quickrent
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.quickrent.screens.*
@@ -26,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             val selectedFragment: Fragment = when (item.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_create_post -> CreatePostFragment()
-                R.id.nav_cart -> CartFragment()
+                R.id.nav_cart -> NotificationFragment()
                 R.id.nav_profile -> ProfileFragment()
                 else -> HomeFragment()
             }
